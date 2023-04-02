@@ -511,12 +511,21 @@ export class WorkspaceSearch {
    * @param {boolean=} preserveCurrent Whether to preserve the current block
    *    if it is included in the new matching blocks.
    */
-  searchAndHighlight(searchText, preserveCurrent) {
+  searchAndHighlight(searchText, preserveCurrent, searchType) {
     const oldCurrentBlock = this.blocks_[this.currentBlockIndex_];
     this.searchText_ = searchText.trim();
     this.clearBlocks();
-    this.blocks_ = this.getMatchingBlocks_(
+
+    if (!searchType) {
+      // if the search was keyword based(default)
+      this.blocks_ = this.getMatchingBlocks_(
         this.workspace_, this.searchText_, this.caseSensitive);
+    } else {
+      // if the search was blocktype based(custom)
+      // in this case searchText will contain the block type
+      this.blocks_ = this.workspace_.getBlocksByType(this.searchText_, true);
+    }
+
     this.highlightSearchGroup_(this.blocks_);
     let currentIdx = 0;
     if (preserveCurrent) {
