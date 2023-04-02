@@ -135,7 +135,19 @@ export class WorkspaceSearch {
     return blockDropdown;
   }
 
-  createSearchType_
+  createSearchTypeDropdown_() {
+    const searchDropdown = document.createElement('select');
+    
+    const keyOpt = document.createElement('option');
+    keyOpt.text = 'keyword';
+    searchDropdown.add(keyOpt);
+
+    const blockOpt = document.createElement('option');
+    blockOpt.text = 'block Type';
+    searchDropdown.add(blockOpt);
+
+    return searchDropdown;
+  }
   /**
    * Initializes the workspace search bar.
    */
@@ -215,11 +227,14 @@ export class WorkspaceSearch {
       this.inputElement_.select();
     });
 
-    this.blockDropdown_ = this.createBlockDropdown_();
-
+    
+    this.searchTypeDropDown_ = this.createSearchTypeDropdown_();
     inputWrapper.appendChild(this.inputElement_);
+    searchContent.appendChild(this.searchTypeDropDown_);
     searchContent.appendChild(inputWrapper);
-    searchContent.appendChild(this.blockDropdown_);
+    
+    //this.blockDropdown_ = this.createBlockDropdown_();
+    //searchContent.appendChild(this.blockDropdown_);
 
     this.actionDiv_ = document.createElement('div');
     Blockly.utils.dom.addClass(this.actionDiv_, 'blockly-ws-search-actions');
