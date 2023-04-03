@@ -150,6 +150,7 @@ export class WorkspaceSearch {
   }
 
   searchChange_(e) {
+    this.clearBlocks();
     const searchType = e.target.value;
     if (searchType === 'keyword') {
       document.getElementsByClassName('blockly-ws-search-input')[0].style.display = 'flex';
@@ -564,13 +565,10 @@ export class WorkspaceSearch {
       // if the search was keyword based(default)
       this.blocks_ = this.getMatchingBlocks_(
         this.workspace_, this.searchText_, this.caseSensitive);
-      console.log(this.blocks_);
     } else {
       // if the search was blocktype based(custom)
       // in this case searchText will contain the block type
-      console.log(this.searchText_);
-      this.blocks_ = this.workspace_.getBlocksByType(this.searchText_, true);
-      console.log(this.blocks_);
+      this.blocks_ = this.getMatchingBlockType_(this.workspace_, this.searchText_);
     }
 
     this.highlightSearchGroup_(this.blocks_);
@@ -647,6 +645,22 @@ export class WorkspaceSearch {
     const searchGroup = this.getSearchPool_(workspace);
     return searchGroup.filter(
         (block) => this.isBlockMatch_(block, searchText, caseSensitive));
+  }
+
+  getMatchingBlockType_(workspace, blockType) {
+    const searchGroup = this.getSearchPool_(workspace);
+    blockType = blockType.toLowerCase();
+    return searchGroup.filter(
+      (blockObj) => this.isBlockOfType_(blockObj, blockType)
+    );
+  }
+
+  isBlockOfType_(blockObj, blockType) {
+    const dict = {'logic_blocks': 'logic', 'loop_blocks': 'loops', 
+                  'math_blocks': 'math', 'text_blocks': 'text',
+                  'list_blocks': 'lists', 'colour_blocks': 'colour',
+                  'variable_blocks': 'variables', 'procedure_blocks': 'functions'};
+    return dict[blockObj.styleName_] === blockType;
   }
 
   /**
