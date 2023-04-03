@@ -624,7 +624,7 @@ export const toolbox = {
     },
     {
       'kind': 'category',
-      'name': 'Color',
+      'name': 'Colour',
       'categorystyle': 'colour_category',
       'contents': [
         {
