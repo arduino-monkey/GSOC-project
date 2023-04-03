@@ -148,6 +148,19 @@ export class WorkspaceSearch {
 
     return searchDropdown;
   }
+
+  searchChange_(e) {
+    const searchType = e.target.value;
+    if (searchType === 'keyword') {
+      document.getElementsByClassName('blockly-ws-search-input')[0].style.display = 'flex';
+      document.getElementsByClassName('blockly-ws-block-select')[0].style.display = 'none';
+    } else if (searchType === 'block Type') {
+      document.getElementsByClassName('blockly-ws-block-select')[0].style.display = 'flex';
+      document.getElementsByClassName('blockly-ws-search-input')[0].style.display = 'none';
+    }
+  }
+
+
   /**
    * Initializes the workspace search bar.
    */
@@ -215,6 +228,13 @@ export class WorkspaceSearch {
     Blockly.utils.dom.addClass(searchContent, 'blockly-ws-search-content');
     searchContainer.appendChild(searchContent);
 
+    // search type selector and wrapper
+    const searchTypeWrapper = document.createElement('div');
+    Blockly.utils.dom.addClass(searchTypeWrapper, 'blockly-ws-search-select');
+    const searchTypeDropdown = this.createSearchTypeDropdown_();
+    this.addEvent_(searchTypeDropdown, 'change', this, (e) => this.searchChange_(e));
+    searchTypeWrapper.appendChild(searchTypeDropdown);
+
     const inputWrapper = document.createElement('div');
     Blockly.utils.dom.addClass(inputWrapper, 'blockly-ws-search-input');
     this.inputElement_ = this.createTextInput_();
@@ -226,15 +246,21 @@ export class WorkspaceSearch {
       this.searchAndHighlight(this.searchText_, this.preserveSelected);
       this.inputElement_.select();
     });
-
-    
-    this.searchTypeDropDown_ = this.createSearchTypeDropdown_();
     inputWrapper.appendChild(this.inputElement_);
-    searchContent.appendChild(this.searchTypeDropDown_);
-    searchContent.appendChild(inputWrapper);
+
+    // block type selector added with search input
+    const blockTypeWrapper = document.createElement('div');
+    Blockly.utils.dom.addClass(blockTypeWrapper, 'blockly-ws-block-select');
+    const blockTypeDropdown = this.createBlockDropdown_();
+    this.addEvent_(blockTypeDropdown, 'change', this, (e) => {
+      this.searchAndHighlight(e.target.value, this.preserveSelected, 'block');
+      this.inputElement_.select;
+    });
+    blockTypeWrapper.appendChild(blockTypeDropdown);
     
-    //this.blockDropdown_ = this.createBlockDropdown_();
-    //searchContent.appendChild(this.blockDropdown_);
+    searchContent.appendChild(searchTypeWrapper);
+    searchContent.appendChild(inputWrapper);
+    searchContent.appendChild(blockTypeWrapper);
 
     this.actionDiv_ = document.createElement('div');
     Blockly.utils.dom.addClass(this.actionDiv_, 'blockly-ws-search-actions');
@@ -259,6 +285,9 @@ export class WorkspaceSearch {
     this.htmlDiv_.appendChild(searchContainer);
 
     injectionDiv.insertBefore(this.htmlDiv_, this.workspace_.getParentSvg());
+
+    // setting the blockTypeWrapper display to none at first
+    document.getElementsByClassName('blockly-ws-block-select')[0].style.display = 'none';
   }
 
   /**
@@ -535,10 +564,13 @@ export class WorkspaceSearch {
       // if the search was keyword based(default)
       this.blocks_ = this.getMatchingBlocks_(
         this.workspace_, this.searchText_, this.caseSensitive);
+      console.log(this.blocks_);
     } else {
       // if the search was blocktype based(custom)
       // in this case searchText will contain the block type
+      console.log(this.searchText_);
       this.blocks_ = this.workspace_.getBlocksByType(this.searchText_, true);
+      console.log(this.blocks_);
     }
 
     this.highlightSearchGroup_(this.blocks_);
